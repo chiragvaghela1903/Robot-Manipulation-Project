@@ -1,0 +1,141 @@
+
+
+clc;
+clear;
+close all;
+
+% =====================================================
+% Initialize Webcam
+% =====================================================
+
+cam = webcam;
+
+disp('Camera Started...');
+
+figure('Name','Camera Assisted Pick and Place');
+
+while true
+
+    % Capture Image
+    img = snapshot(cam);
+
+    % Resize Image
+    img = imresize(img, [480 640]);
+
+    % Convert RGB to HSV
+    hsvImg = rgb2hsv(img);
+
+    H = hsvImg(:,:,1);
+    S = hsvImg(:,:,2);
+    V = hsvImg(:,:,3);
+
+    % =====================================================
+    % Detect Orange Object
+    % =====================================================
+
+    mask = (H > 0.02 & H < 0.10) & ...
+           (S > 0.4) & ...
+           (V > 0.4);
+
+    % Remove Noise
+    mask = bwareaopen(mask, 500);
+
+    % Fill Holes
+    mask = imfill(mask, 'holes');
+
+    % =====================================================
+    % Find Object Properties
+    % =====================================================
+
+    stats = regionprops(mask, ...
+        'BoundingBox', ...
+        'Centroid', ...
+        'Area');
+
+    % Display Original Image
+    imshow(img);
+    hold on;
+
+    % =====================================================
+    % Draw Detection Results
+    % =====================================================
+
+    for k = 1:length(stats)
+
+        if stats(k).Area > 1000
+
+            bbox = stats(k).BoundingBox;
+            centroid = stats(k).Centroid;
+
+            % Draw Bounding Box
+            rectangle( ...
+                'Position', bbox, ...
+                'EdgeColor', 'g', ...
+                'LineWidth', 2);
+
+            % Draw Center Point
+            plot(centroid(1), centroid(2), ...
+                'r*', 'MarkerSize', 10);
+
+            % Display Coordinates
+            text( ...
+                centroid(1), ...
+                centroid(2)-20, ...
+                sprintf('(%.0f, %.0f)', ...
+                centroid(1), centroid(2)), ...
+                'Color', 'white', ...
+                'FontSize', 12, ...
+                'FontWeight', 'bold');
+
+            % =====================================================
+            % Print Coordinates
+            % =====================================================
+
+            fprintf('\nObject Detected\n');
+            fprintf('X = %.0f\n', centroid(1));
+            fprintf('Y = %.0f\n', centroid(2));
+
+            % =====================================================
+            % Theoretical Robot Motion Logic
+            % =====================================================
+
+            if centroid(1) < 220
+                disp('Move Robot Left');
+
+            elseif centroid(1) > 420
+                disp('Move Robot Right');
+
+            else
+                disp('Robot Centered');
+            end
+
+            if centroid(2) < 160
+                disp('Move Robot Forward');
+
+            elseif centroid(2) > 320
+                disp('Move Robot Backward');
+
+            else
+                disp('Object Ready for Pick');
+            end
+
+        end
+    end
+
+    hold off;
+
+    drawnow;
+
+    % =====================================================
+    % Press CTRL+C to Stop
+    % =====================================================
+
+end
+
+% =====================================================
+% Cleanup
+% =====================================================
+
+clear cam;
+
+disp('Program Ended');

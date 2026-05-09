@@ -1,0 +1,241 @@
+/*
+=====================================================
+IE410 Robotics Project – Task 3
+Object Handover Between Two Robot Arms
+Braccio Robot Arm Arduino Code
+=====================================================
+
+Robot Arm 1:
+- Holds object
+- Moves to handover position
+- Releases object
+
+Robot Arm 2:
+- Moves to handover position
+- Grasps object
+- Moves object to final position
+
+=====================================================
+*/
+
+#include <Braccio.h>
+#include <Servo.h>
+
+// =====================================================
+// Servo Objects
+// =====================================================
+
+Servo base;
+Servo shoulder;
+Servo elbow;
+Servo wrist_rot;
+Servo wrist_ver;
+Servo gripper;
+
+void setup()
+{
+    // Initialize Robot
+    Braccio.begin();
+
+    Serial.begin(9600);
+
+    Serial.println("Task 3 Started");
+
+    delay(2000);
+
+    // Home Position
+    homePosition();
+
+    delay(2000);
+
+    // Robot 1 Holds Object
+    robot1Pick();
+
+    delay(1000);
+
+    // Move to Handover Position
+    moveToHandover();
+
+    delay(1000);
+
+    // Robot 2 Grasp Sequence (Theoretical)
+    robot2Grasp();
+
+    delay(1000);
+
+    // Robot 1 Release Object
+    robot1Release();
+
+    delay(1000);
+
+    // Robot 2 Move Object
+    robot2Place();
+
+    delay(1000);
+
+    // Return Home
+    homePosition();
+
+    Serial.println("Task Completed");
+}
+
+void loop()
+{
+    // No loop required
+}
+
+// =====================================================
+// HOME POSITION
+// =====================================================
+
+void homePosition()
+{
+    Braccio.ServoMovement(
+        20,
+        90,
+        90,
+        90,
+        90,
+        90,
+        10
+    );
+
+    delay(1000);
+}
+
+// =====================================================
+// ROBOT 1 PICK OBJECT
+// =====================================================
+
+void robot1Pick()
+{
+    Serial.println("Robot 1 Picking Object");
+
+    // Move to object
+    Braccio.ServoMovement(
+        20,
+        80,
+        60,
+        120,
+        90,
+        90,
+        10
+    );
+
+    delay(1000);
+
+    // Lower arm
+    Braccio.ServoMovement(
+        20,
+        80,
+        75,
+        135,
+        90,
+        90,
+        10
+    );
+
+    delay(1000);
+
+    // Close gripper
+    Braccio.ServoMovement(
+        20,
+        80,
+        75,
+        135,
+        90,
+        90,
+        65
+    );
+
+    delay(1500);
+
+    // Lift object
+    Braccio.ServoMovement(
+        20,
+        80,
+        60,
+        120,
+        90,
+        90,
+        65
+    );
+
+    delay(1000);
+}
+
+// =====================================================
+// MOVE TO HANDOVER POSITION
+// =====================================================
+
+void moveToHandover()
+{
+    Serial.println("Moving to Handover Position");
+
+    Braccio.ServoMovement(
+        20,
+        110,
+        70,
+        110,
+        90,
+        90,
+        65
+    );
+
+    delay(2000);
+}
+
+// =====================================================
+// ROBOT 2 GRASP OBJECT (THEORETICAL)
+// =====================================================
+
+void robot2Grasp()
+{
+    Serial.println("Robot 2 Approaching Object");
+
+    Serial.println("Robot 2 Aligning Gripper");
+
+    delay(1000);
+
+    Serial.println("Robot 2 Grasping Object");
+
+    delay(1500);
+}
+
+// =====================================================
+// ROBOT 1 RELEASE OBJECT
+// =====================================================
+
+void robot1Release()
+{
+    Serial.println("Robot 1 Releasing Object");
+
+    Braccio.ServoMovement(
+        20,
+        110,
+        70,
+        110,
+        90,
+        90,
+        10
+    );
+
+    delay(1500);
+}
+
+// =====================================================
+// ROBOT 2 PLACE OBJECT (THEORETICAL)
+// =====================================================
+
+void robot2Place()
+{
+    Serial.println("Robot 2 Moving Object");
+
+    delay(1000);
+
+    Serial.println("Robot 2 Placing Object");
+
+    delay(1000);
+
+    Serial.println("Object Transfer Completed");
+}

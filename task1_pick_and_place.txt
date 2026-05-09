@@ -1,0 +1,207 @@
+/*
+=====================================================
+IE410 Robotics Project – Task 1
+Pre-Programmed Pick and Place
+Braccio Robot Arm Arduino Code
+=====================================================
+*/
+
+#include <Braccio.h>
+#include <Servo.h>
+
+// Create Servo Objects
+Servo base;
+Servo shoulder;
+Servo elbow;
+Servo wrist_rot;
+Servo wrist_ver;
+Servo gripper;
+
+void setup()
+{
+    // Initialize Braccio Robot
+    Braccio.begin();
+
+    // Start Serial Monitor
+    Serial.begin(9600);
+
+    Serial.println("Task 1 Started");
+
+    delay(2000);
+
+    // Move to Home Position
+    homePosition();
+
+    delay(2000);
+
+    // Pick Object
+    pickObject();
+
+    delay(1000);
+
+    // Place Object
+    placeObject();
+
+    delay(1000);
+
+    // Return Home
+    homePosition();
+
+    Serial.println("Task Completed");
+}
+
+void loop()
+{
+    // No loop required
+}
+
+/*
+=====================================================
+HOME POSITION
+=====================================================
+*/
+
+void homePosition()
+{
+    Braccio.ServoMovement(
+        20,   // Speed
+        90,   // Base
+        90,   // Shoulder
+        90,   // Elbow
+        90,   // Wrist Rotation
+        90,   // Wrist Vertical
+        10    // Gripper Open
+    );
+
+    delay(1000);
+}
+
+/*
+=====================================================
+PICK OBJECT FROM POINT A
+=====================================================
+*/
+
+void pickObject()
+{
+    Serial.println("Moving to Point A");
+
+    // Move Above Object
+    Braccio.ServoMovement(
+        20,
+        90,
+        60,
+        120,
+        90,
+        90,
+        10
+    );
+
+    delay(1000);
+
+    // Lower Arm
+    Braccio.ServoMovement(
+        20,
+        90,
+        75,
+        135,
+        90,
+        90,
+        10
+    );
+
+    delay(1000);
+
+    // Close Gripper
+    Serial.println("Grasping Object");
+
+    Braccio.ServoMovement(
+        20,
+        90,
+        75,
+        135,
+        90,
+        90,
+        65
+    );
+
+    delay(1500);
+
+    // Lift Object
+    Braccio.ServoMovement(
+        20,
+        90,
+        60,
+        120,
+        90,
+        90,
+        65
+    );
+
+    delay(1000);
+}
+
+/*
+=====================================================
+PLACE OBJECT AT POINT B
+=====================================================
+*/
+
+void placeObject()
+{
+    Serial.println("Moving to Point B");
+
+    // Rotate Toward Point B
+    Braccio.ServoMovement(
+        20,
+        150,
+        60,
+        120,
+        90,
+        90,
+        65
+    );
+
+    delay(1000);
+
+    // Lower Object
+    Braccio.ServoMovement(
+        20,
+        150,
+        75,
+        135,
+        90,
+        90,
+        65
+    );
+
+    delay(1000);
+
+    // Open Gripper
+    Serial.println("Releasing Object");
+
+    Braccio.ServoMovement(
+        20,
+        150,
+        75,
+        135,
+        90,
+        90,
+        10
+    );
+
+    delay(1500);
+
+    // Lift Arm
+    Braccio.ServoMovement(
+        20,
+        150,
+        60,
+        120,
+        90,
+        90,
+        10
+    );
+
+    delay(1000);
+}
